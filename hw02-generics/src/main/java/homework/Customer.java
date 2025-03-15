@@ -1,7 +1,7 @@
 package homework;
 
 
-public class Customer {
+public final class Customer {
 
     private final long id;
 

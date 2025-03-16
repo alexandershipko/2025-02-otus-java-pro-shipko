@@ -1,5 +1,6 @@
 rootProject.name = "2025-02-otus-java-pro-shipko"
 include("hw01-gradle")
+include("hw02-generics")
 
 
 pluginManagement {
@@ -22,4 +23,5 @@ pluginManagement {
         id("name.remal.sonarlint") version sonarlint
         id("com.diffplug.spotless") version spotless
     }
+
 }

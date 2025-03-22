@@ -20,19 +20,15 @@ public class TestRunner {
 
 
     private TestRunner() {
-
     }
 
-    public static TestExecutionContext runTest(Class<?> clazz) {
+    public static void runTest(Class<?> clazz) {
         TestExecutionContext context = executeTests(clazz);
-        logger.info("\nStatistics for {}:", clazz.getSimpleName());
-        context.printStats();
-        return context;
+        context.printStats(clazz.getSimpleName());
     }
 
     private static TestExecutionContext executeTests(Class<?> clazz) {
         TestExecutionContext context = new TestExecutionContext();
-
         try {
             Method before = findAnnotatedMethod(clazz, Before.class);
             Method after = findAnnotatedMethod(clazz, After.class);
@@ -43,7 +39,6 @@ public class TestRunner {
                 }
 
                 context.incrementTotal();
-
                 boolean skipTest = !runOptionalPhase(clazz, before, "@Before", testMethod);
 
                 if (!skipTest) {
@@ -56,14 +51,11 @@ public class TestRunner {
                 } else {
                     context.incrementFailed();
                 }
-
                 runOptionalPhase(clazz, after, "@After", testMethod);
             }
-
         } catch (Exception e) {
             logger.error("Error running tests for {}: {}", clazz.getSimpleName(), e.getMessage());
         }
-
         return context;
     }
 

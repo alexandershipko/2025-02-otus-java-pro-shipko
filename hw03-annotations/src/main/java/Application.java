@@ -10,15 +10,12 @@ import test.TestTwo;
 public class Application {
 
     public static void main(String[] args) {
-        TestExecutionContext overallContext = new TestExecutionContext();
+        TestRunner.runTest(TestOne.class);
+        TestRunner.runTest(TestTwo.class);
+        TestRunner.runTest(TestThree.class);
+        TestRunner.runTest(TestFour.class);
 
-        overallContext.add(TestRunner.runTest(TestOne.class));
-        overallContext.add(TestRunner.runTest(TestTwo.class));
-        overallContext.add(TestRunner.runTest(TestThree.class));
-        overallContext.add(TestRunner.runTest(TestFour.class));
-
-        System.out.println("\nOverall statistics:");
-        overallContext.printStats();
+        TestExecutionContext.printOverallStats();
     }
 
 }

@@ -39,10 +39,10 @@ public class TestRunner {
                 }
 
                 context.incrementTotal();
-                boolean skipTest = !runOptionalPhase(clazz, before, "@Before", testMethod);
+                boolean skipTest = !runOptionalPhase(clazz, before, Phase.BEFORE, testMethod);
 
                 if (!skipTest) {
-                    boolean testPassed = runPhase(clazz, testMethod, "Test", testMethod);
+                    boolean testPassed = runPhase(clazz, testMethod, Phase.TEST, testMethod);
                     if (testPassed) {
                         context.incrementPassed();
                     } else {
@@ -51,7 +51,7 @@ public class TestRunner {
                 } else {
                     context.incrementFailed();
                 }
-                runOptionalPhase(clazz, after, "@After", testMethod);
+                runOptionalPhase(clazz, after, Phase.AFTER, testMethod);
             }
         } catch (Exception e) {
             logger.error("Error running tests for {}: {}", clazz.getSimpleName(), e.getMessage());
@@ -68,12 +68,12 @@ public class TestRunner {
         return null;
     }
 
-    private static boolean runPhase(Class<?> clazz, Method method, String phase, Method testMethod) {
+    private static boolean runPhase(Class<?> clazz, Method method, Phase phase, Method testMethod) {
         return createInstance(clazz).map(instance -> {
             try {
                 method.setAccessible(true);
                 method.invoke(instance);
-                if ("Test".equals(phase)) {
+                if (phase == Phase.TEST) {
                     logger.info("Test passed: {}", testMethod.getName());
                 }
                 return true;
@@ -88,7 +88,7 @@ public class TestRunner {
         });
     }
 
-    private static boolean runOptionalPhase(Class<?> clazz, Method method, String phase, Method testMethod) {
+    private static boolean runOptionalPhase(Class<?> clazz, Method method, Phase phase, Method testMethod) {
         return method != null && runPhase(clazz, method, phase, testMethod);
     }
 

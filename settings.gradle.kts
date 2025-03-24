@@ -1,6 +1,7 @@
 rootProject.name = "2025-02-otus-java-pro-shipko"
 include("hw01-gradle")
 include("hw02-generics")
+include("hw03-annotations")
 
 
 pluginManagement {

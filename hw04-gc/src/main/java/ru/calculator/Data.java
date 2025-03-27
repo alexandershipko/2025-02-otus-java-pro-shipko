@@ -2,13 +2,13 @@ package ru.calculator;
 
 
 public class Data {
-    private final int value;
+    private final long value;
 
-    public Data(int value) {
+    public Data(long value) {
         this.value = value;
     }
 
-    public int getValue() {
+    public long getValue() {
         return value;
     }
 

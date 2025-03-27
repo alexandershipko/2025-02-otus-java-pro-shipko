@@ -6,11 +6,11 @@ import java.util.concurrent.ThreadLocalRandom;
 
 
 public class Summator {
-    private int sum = 0;
-    private int prevValue = 0;
-    private int prevPrevValue = 0;
-    private int sumLastThreeValues = 0;
-    private int someValue = 0;
+    private long sum = 0;
+    private long prevValue = 0;
+    private long prevPrevValue = 0;
+    private long sumLastThreeValues = 0;
+    private long someValue = 0;
 
     // !!! эта коллекция должна остаться. Заменять ее на счетчик нельзя.
     private final List<Data> listValues = new ArrayList<>();
@@ -22,7 +22,7 @@ public class Summator {
             listValues.clear();
         }
 
-        int dataValue = data.getValue();
+        long dataValue = data.getValue();
         int random = ThreadLocalRandom.current().nextInt();
         sum += dataValue + random;
 
@@ -31,7 +31,7 @@ public class Summator {
         prevPrevValue = prevValue;
         prevValue = dataValue;
 
-        int temp = sumLastThreeValues * sumLastThreeValues / (dataValue + 1) - sum;
+        long temp = sumLastThreeValues * sumLastThreeValues / (dataValue + 1) - sum;
         for (int idx = 0; idx < 3; idx++) {
             someValue += temp;
             someValue = someValue < 0 ? -someValue : someValue;
@@ -39,23 +39,23 @@ public class Summator {
         }
     }
 
-    public int getSum() {
+    public long getSum() {
         return sum;
     }
 
-    public int getPrevValue() {
+    public long getPrevValue() {
         return prevValue;
     }
 
-    public int getPrevPrevValue() {
+    public long getPrevPrevValue() {
         return prevPrevValue;
     }
 
-    public int getSumLastThreeValues() {
+    public long getSumLastThreeValues() {
         return sumLastThreeValues;
     }
 
-    public int getSomeValue() {
+    public long getSomeValue() {
         return someValue;
     }
 

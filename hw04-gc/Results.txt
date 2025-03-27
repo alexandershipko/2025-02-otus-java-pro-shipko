@@ -1,0 +1,28 @@
+При counter = 500_000_000
+
+До оптимизации:
+8m          падает
+16m         spend msec:539435, sec:539
+128m        spend msec:459260, sec:459
+256m        spend msec:471945, sec:471
+512m        spend msec:461170, sec:461
+1024m       spend msec:452849, sec:452
+2g          spend msec:462199, sec:462
+4g          spend msec:433948, sec:433
+8g          spend msec:438644, sec:438
+16g         spend msec:419055, sec:419
+32g         spend msec:439474, sec:439
+
+------------------------------------------------------------------------------------------------------------------------
+
+
+При counter = 2_000_000_000
+
+До оптимизации:
+256m        spend msec:1912283, sec:1912
+4g          spend msec:1881958, sec:1881
+
+После оптимизации:
+256m        spend msec:32435, sec:32
+4g          spend msec:32232, sec:32
+32g         spend msec:25655, sec:25

@@ -15,6 +15,11 @@ public class LogDemo {
 
         calculatorProxy.calculation(6);
         calculatorProxy.calculation(1, 2);
+
+        //1
+        calculatorProxy.calculation(3, 4, "Hello");
+
+        //2
         calculatorProxy.calculation(3, 4, "Hello");
 
         //disabled
@@ -24,6 +29,13 @@ public class LogDemo {
         //second case
         MyClass myClassProxy = LogProxyFactory.createProxy(MyClass.class, new MyClassImpl());
 
+        //1
+        myClassProxy.testMethod();
+
+        //2
+        myClassProxy.testMethod();
+
+        //3
         myClassProxy.testMethod();
     }
 

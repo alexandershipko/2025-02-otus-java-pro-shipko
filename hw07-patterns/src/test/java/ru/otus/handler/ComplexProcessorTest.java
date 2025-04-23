@@ -1,21 +1,18 @@
 package ru.otus.handler;
 
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.never;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
-
-import java.util.ArrayList;
-import java.util.List;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import ru.otus.listener.Listener;
 import ru.otus.model.Message;
 import ru.otus.processor.Processor;
 import ru.otus.processor.homework.ProcessorSwapField11And12;
+
+import java.util.ArrayList;
+import java.util.List;
+
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
+import static org.mockito.Mockito.*;
 
 class ComplexProcessorTest {
 
@@ -33,7 +30,8 @@ class ComplexProcessorTest {
 
         var processors = List.of(processor1, processor2);
 
-        var complexProcessor = new ComplexProcessor(processors, (ex) -> {});
+        var complexProcessor = new ComplexProcessor(processors, (ex) -> {
+        });
 
         // when
         var result = complexProcessor.handle(message);
@@ -78,7 +76,8 @@ class ComplexProcessorTest {
 
         var listener = mock(Listener.class);
 
-        var complexProcessor = new ComplexProcessor(new ArrayList<>(), (ex) -> {});
+        var complexProcessor = new ComplexProcessor(new ArrayList<>(), (ex) -> {
+        });
 
         complexProcessor.addListener(listener);
 
@@ -108,7 +107,8 @@ class ComplexProcessorTest {
 
         List<Processor> processors = List.of(new ProcessorSwapField11And12());
 
-        var complexProcessor = new ComplexProcessor(processors, (ex) -> {});
+        var complexProcessor = new ComplexProcessor(processors, (ex) -> {
+        });
 
         // when
         var result = complexProcessor.handle(originalMessage);

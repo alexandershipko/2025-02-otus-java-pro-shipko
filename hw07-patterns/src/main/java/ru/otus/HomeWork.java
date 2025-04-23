@@ -6,7 +6,6 @@ import ru.otus.handler.ComplexProcessor;
 import ru.otus.listener.ListenerPrinterConsole;
 import ru.otus.model.Message;
 import ru.otus.processor.LoggerProcessor;
-import ru.otus.processor.ProcessorConcatFields;
 import ru.otus.processor.ProcessorUpperField10;
 import ru.otus.processor.homework.ProcessorSwapField11And12;
 
@@ -39,7 +38,8 @@ public class HomeWork {
         //TODO поправить new LoggerProcessor(new ProcessorUpperField10())
         var processors = List.of(new ProcessorSwapField11And12(), new LoggerProcessor(new ProcessorUpperField10()));
 
-        var complexProcessor = new ComplexProcessor(processors, ex -> {});
+        var complexProcessor = new ComplexProcessor(processors, ex -> {
+        });
         var listenerPrinter = new ListenerPrinterConsole();
         complexProcessor.addListener(listenerPrinter);
 
@@ -51,6 +51,7 @@ public class HomeWork {
                 .field10("field10")
                 .field11("field11")
                 .field12("field12")
+                //TODO
                 .build();
 
         var result = complexProcessor.handle(message);

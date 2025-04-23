@@ -1,12 +1,13 @@
 package ru.otus.listener.homework;
 
-import static org.assertj.core.api.AssertionsForInterfaceTypes.assertThat;
-
-import java.util.ArrayList;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import ru.otus.model.Message;
 import ru.otus.model.ObjectForMessage;
+
+import java.util.ArrayList;
+
+import static org.assertj.core.api.AssertionsForInterfaceTypes.assertThat;
 
 
 class HistoryListenerTest {

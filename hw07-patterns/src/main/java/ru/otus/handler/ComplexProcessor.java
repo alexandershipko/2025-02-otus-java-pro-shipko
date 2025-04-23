@@ -1,11 +1,12 @@
 package ru.otus.handler;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.function.Consumer;
 import ru.otus.listener.Listener;
 import ru.otus.model.Message;
 import ru.otus.processor.Processor;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.function.Consumer;
 
 public class ComplexProcessor implements Handler {
 

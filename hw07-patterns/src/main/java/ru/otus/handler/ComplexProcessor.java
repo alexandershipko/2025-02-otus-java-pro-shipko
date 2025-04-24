@@ -8,6 +8,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Consumer;
 
+
 public class ComplexProcessor implements Handler {
 
     private final List<Listener> listeners = new ArrayList<>();

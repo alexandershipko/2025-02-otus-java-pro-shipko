@@ -11,6 +11,7 @@ import ru.otus.processor.ProcessorUpperField10;
 
 import java.util.List;
 
+
 public class Demo {
     private static final Logger logger = LoggerFactory.getLogger(Demo.class);
 

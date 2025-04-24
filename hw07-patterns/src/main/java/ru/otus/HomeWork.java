@@ -5,10 +5,12 @@ import org.slf4j.LoggerFactory;
 import ru.otus.handler.ComplexProcessor;
 import ru.otus.listener.ListenerPrinterConsole;
 import ru.otus.model.Message;
+import ru.otus.model.ObjectForMessage;
 import ru.otus.processor.homework.ProcessorSwapField11And12;
 import ru.otus.processor.homework.ProcessorThrowOnEvenSecondWithMemento;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 
 public class HomeWork {
@@ -24,7 +26,7 @@ public class HomeWork {
             Тест - важная часть задания
             Обязательно посмотрите пример к паттерну Мементо!
 
-      4. Сделать Listener для ведения истории (подумайте, как сделать, чтобы сообщения не портились)
+      4. Сделать Listener для ведения истории (подумайте, как сделать, чтобы сообщения не портились) - ok
          Уже есть заготовка - класс HistoryListener, надо сделать его реализацию
          Для него уже есть тест, убедитесь, что тест проходит
     */
@@ -48,6 +50,12 @@ public class HomeWork {
         var listenerPrinter = new ListenerPrinterConsole();
         complexProcessor.addListener(listenerPrinter);
 
+        var data = "33";
+        var field13 = new ObjectForMessage();
+        var field13Data = new ArrayList<String>();
+        field13Data.add(data);
+        field13.setData(field13Data);
+
         var message = new Message.Builder(1L)
                 .field1("field1")
                 .field2("field2")
@@ -56,7 +64,7 @@ public class HomeWork {
                 .field10("field10")
                 .field11("field11")
                 .field12("field12")
-                //TODO
+                .field13(field13)
                 .build();
 
         var result = complexProcessor.handle(message);

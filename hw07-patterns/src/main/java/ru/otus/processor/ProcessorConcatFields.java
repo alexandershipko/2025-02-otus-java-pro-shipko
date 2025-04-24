@@ -2,6 +2,7 @@ package ru.otus.processor;
 
 import ru.otus.model.Message;
 
+
 public class ProcessorConcatFields implements Processor {
 
     @Override

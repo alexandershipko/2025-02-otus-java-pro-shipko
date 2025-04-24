@@ -19,6 +19,7 @@ public class Demo {
 
         var complexProcessor = new ComplexProcessor(processors, ex -> {
         });
+
         var listenerPrinter = new ListenerPrinterConsole();
         complexProcessor.addListener(listenerPrinter);
 

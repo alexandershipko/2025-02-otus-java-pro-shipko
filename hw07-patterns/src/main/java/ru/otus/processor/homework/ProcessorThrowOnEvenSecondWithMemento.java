@@ -2,11 +2,13 @@ package ru.otus.processor.homework;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import ru.otus.exception.EvenSecondException;
 import ru.otus.model.Message;
 import ru.otus.model.MessageMemento;
 import ru.otus.processor.Processor;
 
 
+@SuppressWarnings({"java:S2139"})
 public class ProcessorThrowOnEvenSecondWithMemento implements Processor {
 
     private static final Logger logger = LoggerFactory.getLogger(ProcessorThrowOnEvenSecondWithMemento.class);
@@ -26,7 +28,7 @@ public class ProcessorThrowOnEvenSecondWithMemento implements Processor {
         try {
             int second = dateTimeProvider.getDateTime().getSecond();
             if (second % 2 == 0) {
-                throw new RuntimeException("[EvenSecond] - Exception");
+                throw new EvenSecondException("[EvenSecond] - Exception");
             }
 
             newMessage = message.toBuilder()

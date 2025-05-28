@@ -8,6 +8,10 @@ include("hw06-solid")
 include("hw07-patterns")
 include("hw08-io")
 
+include("hw09-jdbc:demo")
+include("hw09-jdbc:homework")
+
+
 
 pluginManagement {
     val jgitver: String by settings

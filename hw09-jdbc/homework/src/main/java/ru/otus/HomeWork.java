@@ -35,9 +35,7 @@ public class HomeWork {
 
 
         // Работа с клиентом
-
-        // используем cache
-        EntityClassMetaData<Client> entityClassMetaDataClient = EntityClassMetaDataImpl.of(Client.class);
+        EntityClassMetaData<Client> entityClassMetaDataClient = new EntityClassMetaDataImpl<>(Client.class);
 
         EntitySQLMetaData entitySQLMetaDataClient  = new EntitySQLMetaDataImpl<>(entityClassMetaDataClient);
         var dataTemplateClient = new DataTemplateJdbc<>(
@@ -55,9 +53,7 @@ public class HomeWork {
 
 
         // Работа с менеджером
-
-        // используем cache
-        EntityClassMetaData<Manager> entityClassMetaDataManager = EntityClassMetaDataImpl.of(Manager.class);
+        EntityClassMetaData<Manager> entityClassMetaDataManager = new EntityClassMetaDataImpl<>(Manager.class);
 
         EntitySQLMetaData entitySQLMetaDataManager = new EntitySQLMetaDataImpl<>(entityClassMetaDataManager);
         var dataTemplateManager = new DataTemplateJdbc<>(dbExecutor, entitySQLMetaDataManager, entityClassMetaDataManager);

@@ -7,21 +7,16 @@ import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 import java.util.Arrays;
 import java.util.List;
-import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
 
 
 public class EntityClassMetaDataImpl<T> implements EntityClassMetaData<T> {
-
-    private static final Map<Class<?>, EntityClassMetaData<?>> CACHE = new ConcurrentHashMap<>();
 
     private final Class<T> clazz;
     private final Constructor<T> constructor;
     private final Field idField;
     private final List<Field> allFields;
     private final List<Field> fieldsWithoutId;
-
 
     public EntityClassMetaDataImpl(Class<T> clazz) {
         this.clazz = clazz;
@@ -41,11 +36,6 @@ public class EntityClassMetaDataImpl<T> implements EntityClassMetaData<T> {
         this.fieldsWithoutId = allFields.stream()
                 .filter(f -> !f.equals(idField))
                 .collect(Collectors.toList());
-    }
-
-    @SuppressWarnings("unchecked")
-    public static <T> EntityClassMetaData<T> of(Class<T> clazz) {
-        return (EntityClassMetaData<T>) CACHE.computeIfAbsent(clazz, EntityClassMetaDataImpl::new);
     }
 
     @Override

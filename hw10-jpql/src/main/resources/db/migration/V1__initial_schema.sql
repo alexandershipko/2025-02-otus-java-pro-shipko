@@ -1,18 +1,32 @@
--- Для @GeneratedValue(strategy = GenerationType.IDENTITY)
-/*
-create table client
+--address
+CREATE SEQUENCE address_SEQ START WITH 1 INCREMENT BY 1;
+
+CREATE TABLE address
 (
-    id   bigserial not null primary key,
-    name varchar(50)
+    id     BIGINT NOT NULL PRIMARY KEY,
+    street VARCHAR(255) NOT NULL
 );
 
- */
 
--- Для @GeneratedValue(strategy = GenerationType.SEQUENCE)
-create sequence client_SEQ start with 1 increment by 1;
+--client
+CREATE SEQUENCE client_SEQ START WITH 1 INCREMENT BY 1;
 
-create table client
+CREATE TABLE client
 (
-    id   bigint not null primary key,
-    name varchar(50)
+    id            BIGINT NOT NULL PRIMARY KEY,
+    name          VARCHAR(50) NOT NULL,
+    address_id    BIGINT,
+    FOREIGN KEY (address_id) REFERENCES address(id) ON DELETE CASCADE
+);
+
+
+--phone
+CREATE SEQUENCE phone_SEQ START WITH 1 INCREMENT BY 1;
+
+CREATE TABLE phone
+(
+    id        BIGINT NOT NULL PRIMARY KEY,
+    number    VARCHAR(20) NOT NULL,
+    client_id BIGINT,
+    FOREIGN KEY (client_id) REFERENCES client(id) ON DELETE CASCADE
 );

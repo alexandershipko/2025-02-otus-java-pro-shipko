@@ -7,8 +7,12 @@ import ru.otus.core.repository.DataTemplateHibernate;
 import ru.otus.core.repository.HibernateUtils;
 import ru.otus.core.sessionmanager.TransactionManagerHibernate;
 import ru.otus.crm.dbmigrations.MigrationsExecutorFlyway;
+import ru.otus.crm.model.Address;
 import ru.otus.crm.model.Client;
+import ru.otus.crm.model.Phone;
 import ru.otus.crm.service.DbServiceClientImpl;
+
+import java.util.List;
 
 public class DbServiceDemo {
 
@@ -25,21 +29,24 @@ public class DbServiceDemo {
 
         new MigrationsExecutorFlyway(dbUrl, dbUserName, dbPassword).executeMigrations();
 
-        var sessionFactory = HibernateUtils.buildSessionFactory(configuration, Client.class);
+        var sessionFactory = HibernateUtils.buildSessionFactory(configuration, Client.class, Address.class, Phone.class);
 
         var transactionManager = new TransactionManagerHibernate(sessionFactory);
-        ///
         var clientTemplate = new DataTemplateHibernate<>(Client.class);
-        ///
         var dbServiceClient = new DbServiceClientImpl(transactionManager, clientTemplate);
-        dbServiceClient.saveClient(new Client("dbServiceFirst"));
+
+        var address = new Address("123 Main St");
+        var phone1 = new Phone("123-456-7890");
+        var phone2 = new Phone("098-765-4321");
+        var client = new Client(null, "dbServiceFirst", address, List.of(phone1, phone2));
+        dbServiceClient.saveClient(client);
 
         var clientSecond = dbServiceClient.saveClient(new Client("dbServiceSecond"));
         var clientSecondSelected = dbServiceClient
                 .getClient(clientSecond.getId())
                 .orElseThrow(() -> new RuntimeException("Client not found, id:" + clientSecond.getId()));
         log.info("clientSecondSelected:{}", clientSecondSelected);
-        ///
+
         dbServiceClient.saveClient(new Client(clientSecondSelected.getId(), "dbServiceSecondUpdated"));
         var clientUpdated = dbServiceClient
                 .getClient(clientSecondSelected.getId())
@@ -47,6 +54,7 @@ public class DbServiceDemo {
         log.info("clientUpdated:{}", clientUpdated);
 
         log.info("All clients");
-        dbServiceClient.findAll().forEach(client -> log.info("client:{}", client));
+        dbServiceClient.findAll().forEach(clientItem -> log.info("client:{}", clientItem));
     }
+
 }

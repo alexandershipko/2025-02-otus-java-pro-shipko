@@ -11,6 +11,7 @@ include("hw08-io")
 include("hw09-jdbc:demo")
 include("hw09-jdbc:homework")
 
+include("hw10-jpql")
 
 
 pluginManagement {

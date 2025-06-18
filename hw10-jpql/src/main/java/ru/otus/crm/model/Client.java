@@ -53,8 +53,9 @@ public class Client implements Cloneable {
         this.phones = new ArrayList<>();
         if (phones != null) {
             for (Phone phone : phones) {
-                phone.setClient(this);
-                this.phones.add(phone);
+                Phone clonedPhone = phone.clone();
+                clonedPhone.setClient(this);
+                this.phones.add(clonedPhone);
             }
         }
     }

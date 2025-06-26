@@ -40,36 +40,37 @@ public class DbServiceClientImpl implements DBServiceClient {
             if (client.getId() == null) {
                 var savedClient = clientDataTemplate.insert(session, clientCloned);
                 log.info("created client: {}", clientCloned);
-                cache.put(String.valueOf(savedClient.getId()), savedClient);
+                cache.put(getCacheKeyForClient(savedClient), savedClient);
                 return savedClient;
             }
 
             var savedClient = clientDataTemplate.update(session, clientCloned);
             log.info("updated client: {}", savedClient);
-            cache.put(String.valueOf(savedClient.getId()), savedClient);
+            cache.put(getCacheKeyForClient(savedClient), savedClient);
             return savedClient;
         });
     }
 
     @Override
     public Optional<Client> getClient(long id) {
-        Client cachedClient = cache.get(String.valueOf(id));
+        String cacheKey = String.valueOf(id);
+        Client cachedClient = cache.get(cacheKey);
 
         if (cachedClient != null) {
             log.info("client retrieved from cache: {}", cachedClient);
             return Optional.of(cachedClient);
         }
 
-        return transactionManager.doInReadOnlyTransaction(session -> {
-            var clientOptional = clientDataTemplate.findById(session, id);
-            if (clientOptional.isPresent()) {
-                cache.put(String.valueOf(id), clientOptional.get());
-                log.info("client retrieved from DB: {}", clientOptional.get());
-            } else {
-                log.warn("Client not found in DB for id: {}", id);
-            }
-            return clientOptional;
-        });
+        return transactionManager.doInReadOnlyTransaction(
+                session -> clientDataTemplate.findById(session, id)
+                        .map(client -> {
+                            cache.put(getCacheKeyForClient(client), client);
+                            log.info("client retrieved from DB: {}", client);
+                            return Optional.of(client);
+                        }).orElseGet(() -> {
+                            log.warn("Client not found in DB for id: {}", id);
+                            return Optional.empty();
+                        }));
     }
 
     @Override
@@ -79,6 +80,10 @@ public class DbServiceClientImpl implements DBServiceClient {
             log.info("clientList:{}", clientList);
             return clientList;
         });
+    }
+
+    private String getCacheKeyForClient(Client client) {
+        return String.valueOf(client.getId());
     }
 
 }

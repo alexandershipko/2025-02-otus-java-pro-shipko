@@ -10,7 +10,3 @@ CREATE TABLE system_user
 
     CONSTRAINT system_user_user_name_uk UNIQUE (user_name)
 );
-
-
--- INSERT INTO system_user (id, user_name, user_password, user_role)
--- VALUES (nextval('system_user_SEQ'), 'admin2', 'password2', 'admin');

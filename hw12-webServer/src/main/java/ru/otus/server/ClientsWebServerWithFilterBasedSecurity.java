@@ -5,7 +5,8 @@ import org.eclipse.jetty.ee10.servlet.FilterHolder;
 import org.eclipse.jetty.ee10.servlet.ServletContextHandler;
 import org.eclipse.jetty.ee10.servlet.ServletHolder;
 import org.eclipse.jetty.server.Handler;
-import ru.otus.crm.service.DBServiceSystemUser;
+
+import ru.otus.crm.service.DBServiceClient;
 import ru.otus.services.TemplateProcessor;
 import ru.otus.services.UserAuthService;
 import ru.otus.servlet.AuthorizationFilter;
@@ -13,12 +14,13 @@ import ru.otus.servlet.LoginServlet;
 
 import java.util.Arrays;
 
-public class UsersWebServerWithFilterBasedSecurity extends UsersWebServerSimple {
+
+public class ClientsWebServerWithFilterBasedSecurity extends ClientsWebServerSimple {
     private final UserAuthService authService;
 
-    public UsersWebServerWithFilterBasedSecurity(
-            int port, UserAuthService authService, DBServiceSystemUser dbServiceSystemUser, Gson gson, TemplateProcessor templateProcessor) {
-        super(port, dbServiceSystemUser, gson, templateProcessor);
+    public ClientsWebServerWithFilterBasedSecurity(
+            int port, UserAuthService authService, DBServiceClient dbServiceClient, Gson gson, TemplateProcessor templateProcessor) {
+        super(port, dbServiceClient, gson, templateProcessor);
         this.authService = authService;
     }
 
@@ -31,4 +33,5 @@ public class UsersWebServerWithFilterBasedSecurity extends UsersWebServerSimple 
                         path -> servletContextHandler.addFilter(new FilterHolder(authorizationFilter), path, null));
         return servletContextHandler;
     }
+
 }

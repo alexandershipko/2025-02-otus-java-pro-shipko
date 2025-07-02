@@ -13,6 +13,7 @@ import java.util.Collections;
 
 import static jakarta.servlet.http.HttpServletResponse.SC_UNAUTHORIZED;
 
+
 @SuppressWarnings({"java:S1989"})
 public class LoginServlet extends HttpServlet {
 
@@ -38,16 +39,16 @@ public class LoginServlet extends HttpServlet {
 
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws IOException {
-
         String name = request.getParameter(PARAM_LOGIN);
         String password = request.getParameter(PARAM_PASSWORD);
 
         if (userAuthService.authenticate(name, password)) {
             HttpSession session = request.getSession();
             session.setMaxInactiveInterval(MAX_INACTIVE_INTERVAL);
-            response.sendRedirect("/users");
+            response.sendRedirect("/clients");
         } else {
             response.setStatus(SC_UNAUTHORIZED);
         }
     }
+
 }

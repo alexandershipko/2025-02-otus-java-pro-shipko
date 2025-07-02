@@ -4,6 +4,7 @@ import org.flywaydb.core.Flyway;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+
 public class MigrationsExecutorFlyway {
     private static final Logger logger = LoggerFactory.getLogger(MigrationsExecutorFlyway.class);
 
@@ -21,4 +22,5 @@ public class MigrationsExecutorFlyway {
         flyway.migrate();
         logger.info("db migration finished.");
     }
+
 }

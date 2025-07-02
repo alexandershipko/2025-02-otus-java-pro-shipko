@@ -2,27 +2,28 @@ package ru.otus.server;
 
 import com.google.gson.Gson;
 import org.eclipse.jetty.ee10.servlet.ServletContextHandler;
-import org.eclipse.jetty.ee10.servlet.ServletHolder;
 import org.eclipse.jetty.server.Handler;
 import org.eclipse.jetty.server.Server;
 import org.eclipse.jetty.server.handler.ResourceHandler;
-import ru.otus.crm.service.DBServiceSystemUser;
+import ru.otus.crm.service.DBServiceClient;
+
 import ru.otus.helpers.FileSystemHelper;
 import ru.otus.services.TemplateProcessor;
-import ru.otus.servlet.UsersApiServlet;
-import ru.otus.servlet.UsersServlet;
+import ru.otus.servlet.ClientsApiServlet;
+import ru.otus.servlet.ClientsServlet;
 
-public class UsersWebServerSimple implements UsersWebServer {
+
+public class ClientsWebServerSimple implements ClientsWebServer {
     private static final String START_PAGE_NAME = "index.html";
     private static final String COMMON_RESOURCES_DIR = "static";
 
-    private final DBServiceSystemUser dbServiceSystemUser;
-    private final Gson gson;
+    private final DBServiceClient dbServiceClient;
     protected final TemplateProcessor templateProcessor;
+    private final Gson gson;
     private final Server server;
 
-    public UsersWebServerSimple(int port, DBServiceSystemUser dbServiceSystemUser, Gson gson, TemplateProcessor templateProcessor) {
-        this.dbServiceSystemUser = dbServiceSystemUser;
+    public ClientsWebServerSimple(int port, DBServiceClient dbServiceClient, Gson gson, TemplateProcessor templateProcessor) {
+        this.dbServiceClient = dbServiceClient;
         this.gson = gson;
         this.templateProcessor = templateProcessor;
         server = new Server(port);
@@ -47,13 +48,12 @@ public class UsersWebServerSimple implements UsersWebServer {
     }
 
     private void initContext() {
-
         ResourceHandler resourceHandler = createResourceHandler();
         ServletContextHandler servletContextHandler = createServletContextHandler();
 
         Handler.Sequence sequence = new Handler.Sequence();
         sequence.addHandler(resourceHandler);
-        sequence.addHandler(applySecurity(servletContextHandler, "/users", "/api/user/*"));
+        sequence.addHandler(applySecurity(servletContextHandler, "/clients", "/api/clients/*"));
 
         server.setHandler(sequence);
     }
@@ -74,8 +74,11 @@ public class UsersWebServerSimple implements UsersWebServer {
 
     private ServletContextHandler createServletContextHandler() {
         ServletContextHandler servletContextHandler = new ServletContextHandler(ServletContextHandler.SESSIONS);
-        servletContextHandler.addServlet(new ServletHolder(new UsersServlet(templateProcessor, dbServiceSystemUser)), "/users");
-        servletContextHandler.addServlet(new ServletHolder(new UsersApiServlet(dbServiceSystemUser, gson)), "/api/user/*");
+
+        servletContextHandler.addServlet(new ClientsApiServlet(dbServiceClient, gson), "/api/clients/*");
+        servletContextHandler.addServlet(new ClientsServlet(dbServiceClient, templateProcessor), "/clients");
+
         return servletContextHandler;
     }
+
 }

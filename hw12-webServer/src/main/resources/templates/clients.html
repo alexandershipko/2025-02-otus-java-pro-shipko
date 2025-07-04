@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <title>Clients Management</title>
+    <style>
+        body {
+            font-family: sans-serif;
+            margin: 20px;
+        }
+
+        h1 {
+            margin-bottom: 10px;
+        }
+
+        .table-wrapper {
+            max-height: 400px;
+            overflow: auto;
+            border: 1px solid #ccc;
+        }
+
+        table {
+            width: 100%;
+            min-width: 600px;
+            border-collapse: collapse;
+        }
+
+        th, td {
+            padding: 8px 12px;
+            border: 1px solid #999;
+            text-align: left;
+            white-space: nowrap;
+        }
+
+        form {
+            margin-top: 30px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 10px;
+        }
+    </style>
+</head>
+<body>
+
+<h1>Clients</h1>
+
+<div class="table-wrapper">
+    <table>
+        <thead>
+        <tr>
+            <th>ID</th>
+            <th>Name</th>
+            <th>Street</th>
+            <th>Phones</th>
+        </tr>
+        </thead>
+        <tbody>
+        <#list clients as client>
+        <tr>
+            <td>${client.id}</td>
+            <td>${client.name}</td>
+            <td>${client.street!''}</td>
+            <td>
+                <#if client.phoneNumbers?has_content>
+                <#list client.phoneNumbers as phone>
+                ${phone}<br/>
+            </#list>
+            <#else>
+            (no phones)
+        </#if>
+        </td>
+        </tr>
+        </#list>
+        </tbody>
+    </table>
+</div>
+
+<h2>Create new client</h2>
+<form id="createClientForm">
+    <label>Name: <input type="text" name="name" required /></label>
+    <label>Street: <input type="text" name="address.street" /></label>
+    <label>Phones (comma separated): <input type="text" name="phones" /></label>
+    <button type="submit">Create</button>
+</form>
+
+<script>
+    document.getElementById('createClientForm').addEventListener('submit', async function(e) {
+        e.preventDefault();
+
+        const form = e.target;
+        const name = form.name.value.trim();
+        const street = form['address.street'].value.trim();
+        const phonesRaw = form.phones.value.trim();
+
+        if (!name) {
+            alert('Name is required');
+            return;
+        }
+
+        const phones = phonesRaw
+            ? phonesRaw.split(',').map(p => ({ number: p.trim() }))
+            : [];
+
+        const client = {
+            name: name,
+            address: { street: street },
+            phones: phones
+        };
+
+        const response = await fetch('/api/clients', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(client)
+        });
+
+        if (response.ok) {
+            alert('Client created');
+            window.location.reload();
+        } else {
+            alert('Error creating client');
+        }
+    });
+</script>
+
+</body>
+</html>

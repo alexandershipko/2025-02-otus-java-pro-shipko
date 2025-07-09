@@ -7,7 +7,7 @@ import org.reflections.Reflections;
 import ru.otus.appcontainer.api.AppComponent;
 import ru.otus.appcontainer.api.AppComponentsContainer;
 import ru.otus.appcontainer.api.AppComponentsContainerConfig;
-import ru.otus.exception.CalculatorException;
+import ru.otus.exception.IoCException;
 
 
 @SuppressWarnings("squid:S1068")
@@ -64,7 +64,7 @@ public class AppComponentsContainerImpl implements AppComponentsContainer {
                 String componentName = Objects.requireNonNull(annotation).name();
 
                 if (appComponentsByName.containsKey(componentName)) {
-                    throw new CalculatorException("Duplicate component name: " + componentName);
+                    throw new IoCException("Duplicate component name: " + componentName);
                 }
 
                 Class<?>[] paramTypes = method.getParameterTypes();
@@ -73,7 +73,7 @@ public class AppComponentsContainerImpl implements AppComponentsContainer {
                 for (int i = 0; i < paramTypes.length; i++) {
                     params[i] = getAppComponent(paramTypes[i]);
                     if (params[i] == null) {
-                        throw new CalculatorException("Dependency not found: " + paramTypes[i].getName());
+                        throw new IoCException("Dependency not found: " + paramTypes[i].getName());
                     }
                 }
 
@@ -84,7 +84,7 @@ public class AppComponentsContainerImpl implements AppComponentsContainer {
                 appComponentsByName.put(componentName, component);
             }
         } catch (Exception e) {
-            throw new CalculatorException("Failed to process config class " + configClass.getName(), e);
+            throw new IoCException("Failed to process config class " + configClass.getName(), e);
         }
     }
 
@@ -103,10 +103,10 @@ public class AppComponentsContainerImpl implements AppComponentsContainer {
             }
         }
         if (candidates.isEmpty()) {
-            throw new CalculatorException("Component not found by class: " + componentClass.getName());
+            throw new IoCException("Component not found by class: " + componentClass.getName());
         }
         if (candidates.size() > 1) {
-            throw new CalculatorException("Multiple components found by class: " + componentClass.getName());
+            throw new IoCException("Multiple components found by class: " + componentClass.getName());
         }
         return candidates.getFirst();
     }
@@ -115,7 +115,7 @@ public class AppComponentsContainerImpl implements AppComponentsContainer {
     public <C> C getAppComponent(String componentName) {
         Object component = appComponentsByName.get(componentName);
         if (component == null) {
-            throw new CalculatorException("Component not found by name: " + componentName);
+            throw new IoCException("Component not found by name: " + componentName);
         }
         return (C) component;
     }

@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layout}">
+<head>
+    <title th:text="${client.id} ? 'Edit Client' : 'Add New Client'">Client Form</title>
+</head>
+<body>
+    <div layout:fragment="content">
+        <div class="row justify-content-center">
+            <div class="col-md-8">
+                <div class="card">
+                    <div class="card-header">
+                        <h3 class="card-title" th:text="${client.id} ? 'Edit Client' : 'Add New Client'"></h3>
+                    </div>
+                    <div class="card-body">
+                        <form th:action="@{/clients/save}" method="post" class="needs-validation" novalidate>
+                            <input type="hidden" name="id" th:value="${client.id}">
+
+                            <div class="mb-3">
+                                <label for="name" class="form-label">Name *</label>
+                                <input type="text" class="form-control" id="name" name="name"
+                                       th:value="${client.name}" required>
+                                <div class="invalid-feedback">
+                                    Please provide a client name.
+                                </div>
+                            </div>
+
+                            <div class="mb-3">
+                                <label for="street" class="form-label">Address (Street)</label>
+                                <input type="text" class="form-control" id="street" name="street"
+                                       th:value="${address?.street ?: ''}"
+                                       placeholder="Enter street address">
+                            </div>
+
+                            <div class="mb-3">
+                                <div class="d-flex justify-content-between align-items-center mb-2">
+                                    <label class="form-label">Phone Numbers</label>
+                                    <button type="button" class="btn btn-sm btn-outline-primary" id="addPhone">
+                                        Add Phone
+                                    </button>
+                                </div>
+
+                                <div id="phoneFields">
+
+                                    <div th:if="${phones != null and !#strings.isEmpty(phones)}" th:remove="tag">
+                                        <div th:each="phone : ${#strings.arraySplit(phones, ',')}" class="input-group mb-2 phone-field">
+                                            <input type="text" class="form-control" name="phones"
+                                                   th:value="${phone}" placeholder="Enter phone number">
+                                            <button type="button" class="btn btn-outline-danger remove-phone">
+                                                Remove
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+                                <a th:href="@{/clients}" class="btn btn-secondary me-md-2">Cancel</a>
+                                <button type="submit" class="btn btn-primary">
+                                    <span th:text="${client.id} ? 'Update' : 'Save'"></span> Client
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="phoneTemplate" class="input-group mb-2 phone-field" style="display: none;">
+        <input type="text" class="form-control" name="phones" placeholder="Enter phone number">
+        <button type="button" class="btn btn-outline-danger remove-phone">
+            Remove
+        </button>
+    </div>
+
+    <script th:inline="javascript">
+        document.addEventListener('DOMContentLoaded', function() {
+
+            const forms = document.querySelectorAll('.needs-validation');
+
+            Array.from(forms).forEach(form => {
+                form.addEventListener('submit', event => {
+                    if (!form.checkValidity()) {
+                        event.preventDefault();
+                        event.stopPropagation();
+                    }
+                    form.classList.add('was-validated');
+                }, false);
+            });
+
+            const addPhoneBtn = document.getElementById('addPhone');
+            const phoneFields = document.getElementById('phoneFields');
+            const phoneTemplate = document.getElementById('phoneTemplate');
+
+            function handleRemoveClick(event) {
+                const phoneField = event.target.closest('.phone-field');
+                if (phoneField) {
+                    const allFields = document.querySelectorAll('.phone-field');
+                    if (allFields.length > 1) {
+                        phoneField.remove();
+                        updateRemoveButtons();
+                    }
+                }
+            }
+
+            phoneFields.addEventListener('click', function(event) {
+                if (event.target.classList.contains('remove-phone')) {
+                    handleRemoveClick(event);
+                }
+            });
+
+            function addPhoneField(value = '') {
+                const newPhoneField = phoneTemplate.cloneNode(true);
+                newPhoneField.style.display = 'flex';
+
+                const input = newPhoneField.querySelector('input');
+                if (value) {
+                    input.value = value;
+                }
+
+                phoneFields.appendChild(newPhoneField);
+                updateRemoveButtons();
+            }
+
+            function updateRemoveButtons() {
+                const phoneFields = document.querySelectorAll('.phone-field');
+                const removeButtons = document.querySelectorAll('.remove-phone');
+
+                removeButtons.forEach(btn => {
+                    btn.style.visibility = phoneFields.length > 1 ? 'visible' : 'hidden';
+                });
+            }
+
+            if (document.querySelectorAll('.phone-field').length === 0) {
+                addPhoneField();
+            } else {
+                updateRemoveButtons();
+            }
+
+            addPhoneBtn?.addEventListener('click', function() {
+                addPhoneField();
+            });
+        });
+    </script>
+</body>
+</html>

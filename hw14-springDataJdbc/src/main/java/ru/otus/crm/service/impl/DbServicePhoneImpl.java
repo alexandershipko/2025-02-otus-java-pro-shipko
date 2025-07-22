@@ -1,6 +1,7 @@
 package ru.otus.crm.service.impl;
 
-import lombok.extern.slf4j.Slf4j;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import ru.otus.crm.model.Phone;
 import ru.otus.crm.repository.PhoneRepository;
@@ -11,9 +12,10 @@ import java.util.List;
 import java.util.Optional;
 
 
-@Slf4j
 @Service
 public class DbServicePhoneImpl implements DBServicePhone {
+
+    private static final Logger log = LoggerFactory.getLogger(DbServicePhoneImpl.class);
 
     private final TransactionManager transactionManager;
     private final PhoneRepository phoneRepository;

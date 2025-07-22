@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layout}">
+<head>
+    <title>Address Details</title>
+</head>
+<body>
+    <div layout:fragment="content">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h2>Address Details</h2>
+            <a th:href="@{/addresses}" class="btn btn-outline-secondary">
+                Back to Addresses
+            </a>
+        </div>
+
+        <div class="card">
+            <div class="card-body">
+                <h5 class="card-title" th:text="'ID: ' + ${address.id}"></h5>
+                <div class="mb-3">
+                    <label class="form-label fw-bold">Street:</label>
+                    <p class="card-text" th:text="${address.street}"></p>
+                </div>
+
+                <div class="mt-4">
+                    <h5>Clients at this address:</h5>
+                    <ul class="list-group" th:if="${!clients.empty}">
+                        <li class="list-group-item" th:each="client : ${clients}">
+                            <a th:href="@{/clients/edit/{id}(id=${client.id})}"
+                               th:text="${client.name}">
+                            </a>
+                        </li>
+                    </ul>
+                    <p class="text-muted" th:if="${clients.empty}">
+                        No clients associated with this address.
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

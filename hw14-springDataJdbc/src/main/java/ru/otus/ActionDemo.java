@@ -3,7 +3,6 @@ package ru.otus;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.boot.CommandLineRunner;
-import org.springframework.stereotype.Component;
 import ru.otus.crm.model.Address;
 import ru.otus.crm.model.Client;
 import ru.otus.crm.model.Phone;
@@ -14,7 +13,7 @@ import ru.otus.crm.service.DBServicePhone;
 import java.util.HashSet;
 
 
-@Component("actionDemo")
+//@Component("actionDemo")
 public class ActionDemo implements CommandLineRunner {
     private static final Logger log = LoggerFactory.getLogger(ActionDemo.class);
 

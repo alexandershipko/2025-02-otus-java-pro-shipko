@@ -3,6 +3,8 @@ package ru.otus;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.boot.CommandLineRunner;
+import org.springframework.data.jdbc.core.mapping.AggregateReference;
+import org.springframework.stereotype.Component;
 import ru.otus.crm.model.Address;
 import ru.otus.crm.model.Client;
 import ru.otus.crm.model.Phone;
@@ -39,7 +41,7 @@ public class ActionDemo implements CommandLineRunner {
         Client client = new Client(
                 null,
                 "dbServiceFirst",
-                savedAddress.id(),
+                AggregateReference.to(savedAddress.id()),
                 new HashSet<>()
         );
         Client savedClient = dbServiceClient.saveClient(client);
@@ -61,7 +63,7 @@ public class ActionDemo implements CommandLineRunner {
         Client updatedClient = new Client(
                 clientSelected.id(),
                 "dbServiceSecondUpdated",
-                clientSelected.addressId(),
+                AggregateReference.to(savedAddress.id()),
                 clientSelected.phones()
         );
         dbServiceClient.saveClient(updatedClient);

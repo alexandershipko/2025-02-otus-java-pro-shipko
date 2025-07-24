@@ -1,6 +1,7 @@
 package ru.otus.crm.controller;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.jdbc.core.mapping.AggregateReference;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -14,8 +15,7 @@ import ru.otus.crm.service.DBServiceAddress;
 import ru.otus.crm.service.DBServiceClient;
 import ru.otus.crm.service.DBServicePhone;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Controller
@@ -36,26 +36,24 @@ public class ClientController {
     public String getAllClients(Model model) {
         List<Client> clients = clientService.findAll();
 
-        List<ClientDetails> clientDetailsList = new ArrayList<>();
+        List<ClientDetails> clientDetailsList = clients.stream()
+                .map(client -> {
+                    Address address = null;
+                    if (client.address() != null && client.address().getId() != null) {
+                        address = addressService.getAddress(client.address().getId()).orElse(null);
+                    }
 
-        for (Client client : clients) {
+                    List<Phone> phones = client.phones() != null ?
+                            new ArrayList<>(client.phones()) :
+                            Collections.emptyList();
 
-            Address address = null;
-            if (client.addressId() != null) {
-                address = addressService.getAddress(client.addressId()).orElse(null);
-            }
-
-            List<Phone> phones = phoneService.findPhonesByClientId(client.id());
-
-            ClientDetails clientDetails = new ClientDetails(
-                    client.id(),
-                    client.name(),
-                    address,
-                    phones
-            );
-
-            clientDetailsList.add(clientDetails);
-        }
+                    return new ClientDetails(
+                            client.id(),
+                            client.name(),
+                            address,
+                            phones
+                    );
+                }).toList();
 
         model.addAttribute("clientDetailsList", clientDetailsList);
         return "clients";
@@ -82,42 +80,43 @@ public class ClientController {
             @RequestParam(value = "street", required = false) String street,
             @RequestParam(value = "phones", required = false) String phones) {
 
-        Client client;
-        if (id != null) {
-
-            Client existingClient = clientService.getClient(id)
-                    .orElseThrow(() -> new RuntimeException("Client not found"));
-
-
-            Address address = existingClient.addressId() != null ?
-                    addressService.getAddress(existingClient.addressId())
-                            .map(a -> new Address(a.id(), street))
-                            .orElse(new Address(null, street)) :
-                    new Address(null, street);
-
-            address = addressService.saveAddress(address);
-
-            client = new Client(id, name, address.id(), null);
-            client = clientService.saveClient(client);
-
-
-            phoneService.findPhonesByClientId(client.id())
-                    .forEach(phone -> phoneService.deletePhone(phone.id()));
-
-        } else {
-
-            Address address = addressService.saveAddress(new Address(null, street));
-            client = clientService.saveClient(new Client(null, name, address.id(), null));
-        }
-
-
+        Set<Phone> phoneSet = new HashSet<>();
         if (phones != null && !phones.trim().isEmpty()) {
             String[] phoneNumbers = phones.split(",");
             for (String number : phoneNumbers) {
                 if (!number.trim().isEmpty()) {
-                    phoneService.savePhone(new Phone(null, number.trim(), client.id()));
+                    phoneSet.add(new Phone(null, number.trim(), null));
                 }
             }
+        }
+
+        if (id != null) {
+            Client existingClient = clientService.getClient(id)
+                    .orElseThrow(() -> new RuntimeException("Client not found"));
+
+            Address address = existingClient.address() != null && existingClient.address().getId() != null ?
+                    addressService.getAddress(existingClient.address().getId())
+                            .map(a -> new Address(a.id(), street))
+                            .orElse(new Address(null, street)) :
+                    new Address(null, street);
+            address = addressService.saveAddress(address);
+
+            Client updatedClient = new Client(
+                    id,
+                    name,
+                    AggregateReference.to(address.id()),
+                    phoneSet
+            );
+            clientService.saveClient(updatedClient);
+        } else {
+            Address address = addressService.saveAddress(new Address(null, street));
+            Client newClient = new Client(
+                    null,
+                    name,
+                    AggregateReference.to(address.id()),
+                    phoneSet
+            );
+            clientService.saveClient(newClient);
         }
 
         return "redirect:/clients";
@@ -128,8 +127,8 @@ public class ClientController {
         Client client = clientService.getClient(id)
                 .orElseThrow(() -> new RuntimeException("Client not found"));
 
-        Address address = client.addressId() != null ?
-                addressService.getAddress(client.addressId()).orElse(null) : null;
+        Address address = client.address() != null && client.address().getId() != null ?
+                addressService.getAddress(client.address().getId()).orElse(null) : null;
 
         List<Phone> phones = phoneService.findPhonesByClientId(client.id());
         String phoneNumbers = phones.stream()
@@ -151,8 +150,8 @@ public class ClientController {
 
             clientService.deleteClient(id);
 
-            if (client.addressId() != null) {
-                addressService.deleteAddress(client.addressId());
+            if (client.address() != null && client.address().getId() != null) {
+                addressService.deleteAddress(client.address().getId());
             }
         });
         return "redirect:/clients";

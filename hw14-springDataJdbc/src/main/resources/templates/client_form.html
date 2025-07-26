@@ -8,12 +8,16 @@
         .address-field, .phone-field {
             position: relative;
             margin-bottom: 0.5rem;
+            display: flex;
+            gap: 10px;
         }
         .remove-address, .remove-phone {
-            position: absolute;
-            right: -40px;
-            top: 50%;
-            transform: translateY(-50%);
+            width: auto;
+            padding: 0.375rem 0.75rem;
+            white-space: nowrap;
+        }
+        .phone-field {
+            align-items: center;
         }
     </style>
 </head>
@@ -108,7 +112,7 @@
 
     <script th:inline="javascript">
         document.addEventListener('DOMContentLoaded', function() {
-
+            // Form validation
             const forms = document.querySelectorAll('.needs-validation');
 
             Array.from(forms).forEach(form => {
@@ -121,26 +125,20 @@
                 }, false);
             });
 
+            // Phone management
             const addPhoneBtn = document.getElementById('addPhone');
             const phoneFields = document.getElementById('phoneFields');
             const phoneTemplate = document.getElementById('phoneTemplate');
 
-            function handleRemoveClick(event) {
+            function handlePhoneRemoveClick(event) {
                 const phoneField = event.target.closest('.phone-field');
                 if (phoneField) {
                     const allFields = document.querySelectorAll('.phone-field');
                     if (allFields.length > 1) {
                         phoneField.remove();
-                        updateRemoveButtons();
                     }
                 }
             }
-
-            phoneFields.addEventListener('click', function(event) {
-                if (event.target.classList.contains('remove-phone')) {
-                    handleRemoveClick(event);
-                }
-            });
 
             function addPhoneField(value = '') {
                 const newPhoneField = phoneTemplate.cloneNode(true);
@@ -152,24 +150,26 @@
                 }
 
                 phoneFields.appendChild(newPhoneField);
-                updateRemoveButtons();
+
+                // Add event listener to the new remove button
+                const removeBtn = newPhoneField.querySelector('.remove-phone');
+                removeBtn.addEventListener('click', handlePhoneRemoveClick);
             }
 
-            function updateRemoveButtons() {
-                const phoneFields = document.querySelectorAll('.phone-field');
-                const removeButtons = document.querySelectorAll('.remove-phone');
-
-                removeButtons.forEach(btn => {
-                    btn.style.visibility = phoneFields.length > 1 ? 'visible' : 'hidden';
+            // Initialize phone fields
+            const existingPhoneFields = document.querySelectorAll('.phone-field');
+            if (existingPhoneFields.length === 0) {
+                addPhoneField();
+            } else {
+                existingPhoneFields.forEach(field => {
+                    const removeBtn = field.querySelector('.remove-phone');
+                    if (removeBtn) {
+                        removeBtn.addEventListener('click', handlePhoneRemoveClick);
+                    }
                 });
             }
 
-            if (document.querySelectorAll('.phone-field').length === 0) {
-                addPhoneField();
-            } else {
-                updateRemoveButtons();
-            }
-
+            // Add button event listener
             addPhoneBtn?.addEventListener('click', function() {
                 addPhoneField();
             });
@@ -179,49 +179,49 @@
             const addressFields = document.getElementById('addressFields');
             const addressTemplate = document.getElementById('addressTemplate');
 
-            function addAddressField(value = '') {
-                const newAddress = addressTemplate.cloneNode(true);
-                newAddress.style.display = 'block';
-                const input = newAddress.querySelector('input');
-                if (value) input.value = value;
-
-                // Always append to the end of the container
-                addressFields.appendChild(newAddress);
-                updateRemoveButtonsAddress();
+            function handleAddressRemoveClick(event) {
+                const addressField = event.target.closest('.address-field');
+                if (addressField) {
+                    const allFields = document.querySelectorAll('.address-field');
+                    if (allFields.length > 1) {
+                        addressField.remove();
+                    }
+                }
             }
 
-            function updateRemoveButtonsAddress() {
-                const addressFields = document.querySelectorAll('.address-field');
-                addressFields.forEach((field, index) => {
-                    const btn = field.querySelector('.remove-address');
-                    if (addressFields.length > 1) {
-                        btn.style.display = 'block';
-                    } else {
-                        btn.style.display = 'none';
+            function addAddressField(value = '') {
+                const newAddress = addressTemplate.cloneNode(true);
+                newAddress.style.display = 'flex';
+
+                const input = newAddress.querySelector('input');
+                if (value) {
+                    input.value = value;
+                }
+
+                addressFields.appendChild(newAddress);
+
+                // Add event listener to the new remove button
+                const removeBtn = newAddress.querySelector('.remove-address');
+                removeBtn.addEventListener('click', handleAddressRemoveClick);
+            }
+
+            // Initialize address fields
+            const existingAddressFields = document.querySelectorAll('.address-field');
+            if (existingAddressFields.length === 0) {
+                addAddressField();
+            } else {
+                existingAddressFields.forEach(field => {
+                    const removeBtn = field.querySelector('.remove-address');
+                    if (removeBtn) {
+                        removeBtn.addEventListener('click', handleAddressRemoveClick);
                     }
                 });
             }
 
-            // Handle address removal
-            document.addEventListener('click', function(event) {
-                if (event.target.classList.contains('remove-address')) {
-                    const addressField = event.target.closest('.address-field');
-                    if (addressField && document.querySelectorAll('.address-field').length > 1) {
-                        addressField.remove();
-                        updateRemoveButtonsAddress();
-                    }
-                }
-            });
-
             // Add button event listener
-            addAddressBtn?.addEventListener('click', () => addAddressField());
-
-            // Initialize with one empty address if none exists
-            if (document.querySelectorAll('.address-field').length === 0) {
+            addAddressBtn?.addEventListener('click', function() {
                 addAddressField();
-            } else {
-                updateRemoveButtonsAddress();
-            }
+            });
         });
     </script>
 </body>

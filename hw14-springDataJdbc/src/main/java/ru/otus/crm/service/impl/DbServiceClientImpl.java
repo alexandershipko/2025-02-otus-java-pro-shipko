@@ -36,7 +36,7 @@ public class DbServiceClientImpl implements DBServiceClient {
     }
 
     @Override
-    public Optional<Client> getClient(long id) {
+    public Optional<Client> getClient(Long id) {
         var clientOptional = clientRepository.findById(id);
         log.info("client: {}", clientOptional);
         return clientOptional;
@@ -51,7 +51,7 @@ public class DbServiceClientImpl implements DBServiceClient {
     }
 
     @Override
-    public void deleteClient(long id) {
+    public void deleteClient(Long id) {
         transactionManager.doInTransaction(() -> {
             clientRepository.deleteById(id);
             log.info("Deleted client with id: {}", id);

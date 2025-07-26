@@ -7,7 +7,7 @@ import org.springframework.data.relational.core.mapping.Table;
 
 @Table("phone")
 public record Phone(
-        @Id Long id,
+        @Id @Column("id") Long id,
         String number,
         @Column("client_id") Long clientId
 ) {

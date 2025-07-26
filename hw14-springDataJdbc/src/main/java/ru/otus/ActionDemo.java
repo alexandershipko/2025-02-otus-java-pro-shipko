@@ -3,7 +3,6 @@ package ru.otus;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.boot.CommandLineRunner;
-import org.springframework.data.jdbc.core.mapping.AggregateReference;
 import org.springframework.stereotype.Component;
 import ru.otus.crm.model.Address;
 import ru.otus.crm.model.Client;
@@ -13,9 +12,10 @@ import ru.otus.crm.service.DBServiceClient;
 import ru.otus.crm.service.DBServicePhone;
 
 import java.util.HashSet;
+import java.util.Set;
 
 
-//@Component("actionDemo")
+@Component("actionDemo")
 public class ActionDemo implements CommandLineRunner {
     private static final Logger log = LoggerFactory.getLogger(ActionDemo.class);
 
@@ -34,44 +34,74 @@ public class ActionDemo implements CommandLineRunner {
 
     @Override
     public void run(String... args) {
-        Address address = new Address(null, "123 Main St");
-        Address savedAddress = dbServiceAddress.saveAddress(address);
-        log.info("Saved address: {}", savedAddress);
 
-        Client client = new Client(
-                null,
-                "dbServiceFirst",
-                AggregateReference.to(savedAddress.id()),
-                new HashSet<>()
+        Client newClient = dbServiceClient.saveClient(
+                new Client(null, "John Smith", new HashSet<>(), new HashSet<>(), true)
         );
-        Client savedClient = dbServiceClient.saveClient(client);
-        log.info("Saved client: {}", savedClient);
 
-        Phone phone1 = new Phone(null, "123-456-7890", savedClient.id());
-        Phone phone2 = new Phone(null, "098-765-4321", savedClient.id());
+        Address homeAddress = dbServiceAddress.saveAddress(
+                new Address(null, "123 Main St", newClient.getId())
+        );
+        Address workAddress = dbServiceAddress.saveAddress(
+                new Address(null, "456 Work Ave", newClient.getId())
+        );
 
-        dBServicePhone.savePhone(phone1);
-        dBServicePhone.savePhone(phone2);
-        log.info("Saved phones: {}, {}", phone1, phone2);
+        Phone mobilePhone = dBServicePhone.savePhone(
+                new Phone(null, "+1234567890", newClient.getId())
+        );
+        Phone workPhone = dBServicePhone.savePhone(
+                new Phone(null, "+1987654321", newClient.getId())
+        );
+
+        Client clientWithContacts = new Client(
+                newClient.getId(),
+                newClient.getName(),
+                new HashSet<>(Set.of(homeAddress, workAddress)),
+                new HashSet<>(Set.of(mobilePhone, workPhone)),
+                false
+        );
+        Client savedClient = dbServiceClient.saveClient(clientWithContacts);
+
+        Client existingClient = dbServiceClient.getClient(savedClient.getId())
+                .orElseThrow(() -> new RuntimeException("Client not found"));
+
+        Set<Address> currentAddresses = new HashSet<>(existingClient.getAddresses());
+        Set<Phone> currentPhones = new HashSet<>(existingClient.getPhones());
 
 
-        Client clientSelected = dbServiceClient.getClient(savedClient.id())
-                .orElseThrow(() -> new RuntimeException("Client not found, id: " + savedClient.id()));
-        log.info("clientSecondSelected: {}", clientSelected);
+        Address oldHomeAddress = currentAddresses.stream()
+                .filter(a -> a.street().equals("123 Main St"))
+                .findFirst()
+                .orElseThrow();
+        currentAddresses.remove(oldHomeAddress);
+        currentAddresses.add(
+                dbServiceAddress.saveAddress(
+                        new Address(oldHomeAddress.id(), "789 New Home St", existingClient.getId())
+                )
+        );
 
+
+        Phone oldMobilePhone = currentPhones.stream()
+                .filter(p -> p.number().equals("+1234567890"))
+                .findFirst()
+                .orElseThrow();
+        currentPhones.remove(oldMobilePhone);
+        currentPhones.add(
+                dBServicePhone.savePhone(
+                        new Phone(oldMobilePhone.id(), "+1112223333", existingClient.getId())
+                )
+        );
 
         Client updatedClient = new Client(
-                clientSelected.id(),
-                "dbServiceSecondUpdated",
-                AggregateReference.to(savedAddress.id()),
-                clientSelected.phones()
+                existingClient.getId(),
+                "John Smith Jr.",
+                currentAddresses,
+                currentPhones,
+                false
         );
-        dbServiceClient.saveClient(updatedClient);
-        log.info("Updated client: {}", updatedClient);
 
-
-        log.info("All clients");
-        dbServiceClient.findAll().forEach(clientItem -> log.info("client:{}", clientItem));
+        Client finalResult = dbServiceClient.saveClient(updatedClient);
+        log.info("Final client data: {}", finalResult);
     }
 
 }

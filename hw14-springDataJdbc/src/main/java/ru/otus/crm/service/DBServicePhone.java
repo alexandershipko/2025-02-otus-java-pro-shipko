@@ -18,4 +18,6 @@ public interface DBServicePhone {
 
     void deletePhone(long id);
 
+    void deleteAllByClientId(Long clientId);
+
 }

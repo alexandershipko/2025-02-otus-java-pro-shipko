@@ -25,14 +25,22 @@
             font-size: 0.9em;
         }
 
-        .address-card {
-            padding: 10px;
-            background-color: #f8f9fa;
+        .address-badge {
+            margin: 2px;
+            padding: 5px 8px;
+            display: inline-flex;
+            align-items: center;
+            background-color: #e9ecef;
             border-radius: 4px;
-            border-left: 3px solid #0d6efd;
+            font-size: 0.9em;
         }
 
         .phone-icon {
+            margin-right: 5px;
+            color: #0d6efd;
+        }
+
+        .address-icon {
             margin-right: 5px;
             color: #0d6efd;
         }
@@ -85,11 +93,16 @@
                             <strong th:text="${client.name}"></strong>
                         </td>
                         <td>
-                            <div th:if="${client.address != null}" class="address-card">
-                                <div class="fw-bold" th:text="${client.address.street}"></div>
+                            <div th:if="${client.addresses != null and !client.addresses.empty}">
+                                <div th:each="address : ${client.addresses}">
+                                    <div class="address-badge">
+                                        <i class="bi bi-geo-alt address-icon"></i>
+                                        <span th:text="${address.street}"></span>
+                                    </div>
+                                </div>
                             </div>
-                            <div th:unless="${client.address != null}" class="text-muted">
-                                <i class="bi bi-house-dash"></i> No address
+                            <div th:unless="${client.addresses != null and !client.addresses.empty}" class="text-muted">
+                                <i class="bi bi-house-dash"></i> No addresses
                             </div>
                         </td>
                         <td>

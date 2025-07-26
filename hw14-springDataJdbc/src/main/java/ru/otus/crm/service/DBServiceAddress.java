@@ -16,4 +16,5 @@ public interface DBServiceAddress {
 
     void deleteAddress(long id);
 
+    void deleteAllByClientId(Long clientId);
 }

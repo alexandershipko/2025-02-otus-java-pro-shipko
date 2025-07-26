@@ -57,4 +57,13 @@ public class DbServiceAddressImpl implements DBServiceAddress {
         });
     }
 
+    @Override
+    public void deleteAllByClientId(Long clientId) {
+        transactionManager.doInTransaction(() -> {
+            addressRepository.deleteAllByClientId(clientId);
+            log.info("Deleted address with clientId: {}", clientId);
+            return null;
+        });
+    }
+
 }

@@ -64,4 +64,13 @@ public class DbServicePhoneImpl implements DBServicePhone {
         });
     }
 
+    @Override
+    public void deleteAllByClientId(Long clientId) {
+        transactionManager.doInTransaction(() -> {
+            phoneRepository.deleteAllByClientId(clientId);
+            log.info("Deleted phone with clientId: {}", clientId);
+            return null;
+        });
+    }
+
 }

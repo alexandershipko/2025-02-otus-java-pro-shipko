@@ -3,7 +3,19 @@
       xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
       layout:decorate="~{layout}">
 <head>
-    <title th:text="${client.id} ? 'Edit Client' : 'Add New Client'">Client Form</title>
+    <title th:text="${client.id != null ? 'Edit Client' : 'Add New Client'}">Client Form</title>
+    <style>
+        .address-field, .phone-field {
+            position: relative;
+            margin-bottom: 0.5rem;
+        }
+        .remove-address, .remove-phone {
+            position: absolute;
+            right: -40px;
+            top: 50%;
+            transform: translateY(-50%);
+        }
+    </style>
 </head>
 <body>
     <div layout:fragment="content">
@@ -11,7 +23,7 @@
             <div class="col-md-8">
                 <div class="card">
                     <div class="card-header">
-                        <h3 class="card-title" th:text="${client.id} ? 'Edit Client' : 'Add New Client'"></h3>
+                        <h3 class="card-title" th:text="${client.id != null ? 'Edit Client' : 'Add New Client'}"></h3>
                     </div>
                     <div class="card-body">
                         <form th:action="@{/clients/save}" method="post" class="needs-validation" novalidate>
@@ -26,11 +38,24 @@
                                 </div>
                             </div>
 
-                            <div class="mb-3">
-                                <label for="street" class="form-label">Address (Street)</label>
-                                <input type="text" class="form-control" id="street" name="street"
-                                       th:value="${address?.street ?: ''}"
-                                       placeholder="Enter street address">
+                            <div class="mb-4">
+                                <div class="d-flex justify-content-between align-items-center mb-2">
+                                    <label class="form-label">Addresses</label>
+                                    <button type="button" class="btn btn-sm btn-outline-primary" id="addAddress">
+                                        Add Address
+                                    </button>
+                                </div>
+                                <div id="addressFields">
+                                    <div th:if="${addresses != null and !addresses.isEmpty()}" th:remove="tag">
+                                        <div th:each="address : ${addresses}" class="mb-3 position-relative address-field">
+                                            <input type="text" class="form-control" name="addresses"
+                                                   th:value="${address}" placeholder="Enter street address">
+                                            <button type="button" class="btn btn-sm btn-outline-danger remove-address">
+                                                Remove
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
                             </div>
 
                             <div class="mb-3">
@@ -42,9 +67,8 @@
                                 </div>
 
                                 <div id="phoneFields">
-
-                                    <div th:if="${phones != null and !#strings.isEmpty(phones)}" th:remove="tag">
-                                        <div th:each="phone : ${#strings.arraySplit(phones, ',')}" class="input-group mb-2 phone-field">
+                                    <div th:if="${phones != null and !phones.isEmpty()}" th:remove="tag">
+                                        <div th:each="phone : ${phones}" class="input-group mb-2 phone-field">
                                             <input type="text" class="form-control" name="phones"
                                                    th:value="${phone}" placeholder="Enter phone number">
                                             <button type="button" class="btn btn-outline-danger remove-phone">
@@ -58,7 +82,7 @@
                             <div class="d-grid gap-2 d-md-flex justify-content-md-end">
                                 <a th:href="@{/clients}" class="btn btn-secondary me-md-2">Cancel</a>
                                 <button type="submit" class="btn btn-primary">
-                                    <span th:text="${client.id} ? 'Update' : 'Save'"></span> Client
+                                    <span th:text="${client.id != null} ? 'Update' : 'Save'"></span> Client
                                 </button>
                             </div>
                         </form>
@@ -71,6 +95,13 @@
     <div id="phoneTemplate" class="input-group mb-2 phone-field" style="display: none;">
         <input type="text" class="form-control" name="phones" placeholder="Enter phone number">
         <button type="button" class="btn btn-outline-danger remove-phone">
+            Remove
+        </button>
+    </div>
+
+    <div id="addressTemplate" class="mb-3 position-relative address-field" style="display: none;">
+        <input type="text" class="form-control" name="addresses" placeholder="Enter street address">
+        <button type="button" class="btn btn-sm btn-outline-danger remove-address">
             Remove
         </button>
     </div>
@@ -142,6 +173,55 @@
             addPhoneBtn?.addEventListener('click', function() {
                 addPhoneField();
             });
+
+            // Address management
+            const addAddressBtn = document.getElementById('addAddress');
+            const addressFields = document.getElementById('addressFields');
+            const addressTemplate = document.getElementById('addressTemplate');
+
+            function addAddressField(value = '') {
+                const newAddress = addressTemplate.cloneNode(true);
+                newAddress.style.display = 'block';
+                const input = newAddress.querySelector('input');
+                if (value) input.value = value;
+
+                // Always append to the end of the container
+                addressFields.appendChild(newAddress);
+                updateRemoveButtonsAddress();
+            }
+
+            function updateRemoveButtonsAddress() {
+                const addressFields = document.querySelectorAll('.address-field');
+                addressFields.forEach((field, index) => {
+                    const btn = field.querySelector('.remove-address');
+                    if (addressFields.length > 1) {
+                        btn.style.display = 'block';
+                    } else {
+                        btn.style.display = 'none';
+                    }
+                });
+            }
+
+            // Handle address removal
+            document.addEventListener('click', function(event) {
+                if (event.target.classList.contains('remove-address')) {
+                    const addressField = event.target.closest('.address-field');
+                    if (addressField && document.querySelectorAll('.address-field').length > 1) {
+                        addressField.remove();
+                        updateRemoveButtonsAddress();
+                    }
+                }
+            });
+
+            // Add button event listener
+            addAddressBtn?.addEventListener('click', () => addAddressField());
+
+            // Initialize with one empty address if none exists
+            if (document.querySelectorAll('.address-field').length === 0) {
+                addAddressField();
+            } else {
+                updateRemoveButtonsAddress();
+            }
         });
     </script>
 </body>

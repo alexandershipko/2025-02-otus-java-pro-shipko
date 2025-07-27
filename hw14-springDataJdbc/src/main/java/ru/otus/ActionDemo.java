@@ -36,7 +36,7 @@ public class ActionDemo implements CommandLineRunner {
     public void run(String... args) {
 
         Client newClient = dbServiceClient.saveClient(
-                new Client(null, "John Smith", new HashSet<>(), new HashSet<>(), true)
+                new Client(null, "John Smith", new HashSet<>(), new HashSet<>())
         );
 
         Address homeAddress = dbServiceAddress.saveAddress(
@@ -57,8 +57,7 @@ public class ActionDemo implements CommandLineRunner {
                 newClient.getId(),
                 newClient.getName(),
                 new HashSet<>(Set.of(homeAddress, workAddress)),
-                new HashSet<>(Set.of(mobilePhone, workPhone)),
-                false
+                new HashSet<>(Set.of(mobilePhone, workPhone))
         );
         Client savedClient = dbServiceClient.saveClient(clientWithContacts);
 
@@ -96,8 +95,7 @@ public class ActionDemo implements CommandLineRunner {
                 existingClient.getId(),
                 "John Smith Jr.",
                 currentAddresses,
-                currentPhones,
-                false
+                currentPhones
         );
 
         Client finalResult = dbServiceClient.saveClient(updatedClient);

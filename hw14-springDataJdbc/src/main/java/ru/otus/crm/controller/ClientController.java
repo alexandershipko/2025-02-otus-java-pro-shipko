@@ -53,7 +53,7 @@ public class ClientController {
 
     @GetMapping("/clients/new")
     public String showNewClientForm(Model model) {
-        model.addAttribute("client", new Client(null, "", new HashSet<>(), new HashSet<>(), true));
+        model.addAttribute("client", new Client(null, "", new HashSet<>(), new HashSet<>()));
 
         return "client_form";
     }
@@ -93,11 +93,10 @@ public class ClientController {
                     client.getId(),
                     name,
                     addresses,
-                    phones,
-                    client.isNew()
+                    phones
             );
         } else {
-            client = new Client(null, name, addresses, phones, true);
+            client = new Client(null, name, addresses, phones);
         }
 
         clientService.saveClient(client);

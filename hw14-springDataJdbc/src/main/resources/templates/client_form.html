@@ -1,0 +1,228 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layout}">
+<head>
+    <title th:text="${client.id != null ? 'Edit Client' : 'Add New Client'}">Client Form</title>
+    <style>
+        .address-field, .phone-field {
+            position: relative;
+            margin-bottom: 0.5rem;
+            display: flex;
+            gap: 10px;
+        }
+        .remove-address, .remove-phone {
+            width: auto;
+            padding: 0.375rem 0.75rem;
+            white-space: nowrap;
+        }
+        .phone-field {
+            align-items: center;
+        }
+    </style>
+</head>
+<body>
+    <div layout:fragment="content">
+        <div class="row justify-content-center">
+            <div class="col-md-8">
+                <div class="card">
+                    <div class="card-header">
+                        <h3 class="card-title" th:text="${client.id != null ? 'Edit Client' : 'Add New Client'}"></h3>
+                    </div>
+                    <div class="card-body">
+                        <form th:action="@{/clients/save}" method="post" class="needs-validation" novalidate>
+                            <input type="hidden" name="id" th:value="${client.id}">
+
+                            <div class="mb-3">
+                                <label for="name" class="form-label">Name *</label>
+                                <input type="text" class="form-control" id="name" name="name"
+                                       th:value="${client.name}" required>
+                                <div class="invalid-feedback">
+                                    Please provide a client name.
+                                </div>
+                            </div>
+
+                            <div class="mb-4">
+                                <div class="d-flex justify-content-between align-items-center mb-2">
+                                    <label class="form-label">Addresses</label>
+                                    <button type="button" class="btn btn-sm btn-outline-primary" id="addAddress">
+                                        Add Address
+                                    </button>
+                                </div>
+                                <div id="addressFields">
+                                    <div th:if="${addresses != null and !addresses.isEmpty()}" th:remove="tag">
+                                        <div th:each="address : ${addresses}" class="mb-3 position-relative address-field">
+                                            <input type="text" class="form-control" name="addresses"
+                                                   th:value="${address}" placeholder="Enter street address">
+                                            <button type="button" class="btn btn-sm btn-outline-danger remove-address">
+                                                Remove
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="mb-3">
+                                <div class="d-flex justify-content-between align-items-center mb-2">
+                                    <label class="form-label">Phone Numbers</label>
+                                    <button type="button" class="btn btn-sm btn-outline-primary" id="addPhone">
+                                        Add Phone
+                                    </button>
+                                </div>
+
+                                <div id="phoneFields">
+                                    <div th:if="${phones != null and !phones.isEmpty()}" th:remove="tag">
+                                        <div th:each="phone : ${phones}" class="input-group mb-2 phone-field">
+                                            <input type="text" class="form-control" name="phones"
+                                                   th:value="${phone}" placeholder="Enter phone number">
+                                            <button type="button" class="btn btn-outline-danger remove-phone">
+                                                Remove
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+                                <a th:href="@{/clients}" class="btn btn-secondary me-md-2">Cancel</a>
+                                <button type="submit" class="btn btn-primary">
+                                    <span th:text="${client.id != null} ? 'Update' : 'Save'"></span> Client
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="phoneTemplate" class="input-group mb-2 phone-field" style="display: none;">
+        <input type="text" class="form-control" name="phones" placeholder="Enter phone number">
+        <button type="button" class="btn btn-outline-danger remove-phone">
+            Remove
+        </button>
+    </div>
+
+    <div id="addressTemplate" class="mb-3 position-relative address-field" style="display: none;">
+        <input type="text" class="form-control" name="addresses" placeholder="Enter street address">
+        <button type="button" class="btn btn-sm btn-outline-danger remove-address">
+            Remove
+        </button>
+    </div>
+
+    <script th:inline="javascript">
+        document.addEventListener('DOMContentLoaded', function() {
+            // Form validation
+            const forms = document.querySelectorAll('.needs-validation');
+
+            Array.from(forms).forEach(form => {
+                form.addEventListener('submit', event => {
+                    if (!form.checkValidity()) {
+                        event.preventDefault();
+                        event.stopPropagation();
+                    }
+                    form.classList.add('was-validated');
+                }, false);
+            });
+
+            // Phone management
+            const addPhoneBtn = document.getElementById('addPhone');
+            const phoneFields = document.getElementById('phoneFields');
+            const phoneTemplate = document.getElementById('phoneTemplate');
+
+            function handlePhoneRemoveClick(event) {
+                const phoneField = event.target.closest('.phone-field');
+                if (phoneField) {
+                    const allFields = document.querySelectorAll('.phone-field');
+                    if (allFields.length > 1) {
+                        phoneField.remove();
+                    }
+                }
+            }
+
+            function addPhoneField(value = '') {
+                const newPhoneField = phoneTemplate.cloneNode(true);
+                newPhoneField.style.display = 'flex';
+
+                const input = newPhoneField.querySelector('input');
+                if (value) {
+                    input.value = value;
+                }
+
+                phoneFields.appendChild(newPhoneField);
+
+                // Add event listener to the new remove button
+                const removeBtn = newPhoneField.querySelector('.remove-phone');
+                removeBtn.addEventListener('click', handlePhoneRemoveClick);
+            }
+
+            // Initialize phone fields
+            const existingPhoneFields = document.querySelectorAll('.phone-field');
+            if (existingPhoneFields.length === 0) {
+                addPhoneField();
+            } else {
+                existingPhoneFields.forEach(field => {
+                    const removeBtn = field.querySelector('.remove-phone');
+                    if (removeBtn) {
+                        removeBtn.addEventListener('click', handlePhoneRemoveClick);
+                    }
+                });
+            }
+
+            // Add button event listener
+            addPhoneBtn?.addEventListener('click', function() {
+                addPhoneField();
+            });
+
+            // Address management
+            const addAddressBtn = document.getElementById('addAddress');
+            const addressFields = document.getElementById('addressFields');
+            const addressTemplate = document.getElementById('addressTemplate');
+
+            function handleAddressRemoveClick(event) {
+                const addressField = event.target.closest('.address-field');
+                if (addressField) {
+                    const allFields = document.querySelectorAll('.address-field');
+                    if (allFields.length > 1) {
+                        addressField.remove();
+                    }
+                }
+            }
+
+            function addAddressField(value = '') {
+                const newAddress = addressTemplate.cloneNode(true);
+                newAddress.style.display = 'flex';
+
+                const input = newAddress.querySelector('input');
+                if (value) {
+                    input.value = value;
+                }
+
+                addressFields.appendChild(newAddress);
+
+                // Add event listener to the new remove button
+                const removeBtn = newAddress.querySelector('.remove-address');
+                removeBtn.addEventListener('click', handleAddressRemoveClick);
+            }
+
+            // Initialize address fields
+            const existingAddressFields = document.querySelectorAll('.address-field');
+            if (existingAddressFields.length === 0) {
+                addAddressField();
+            } else {
+                existingAddressFields.forEach(field => {
+                    const removeBtn = field.querySelector('.remove-address');
+                    if (removeBtn) {
+                        removeBtn.addEventListener('click', handleAddressRemoveClick);
+                    }
+                });
+            }
+
+            // Add button event listener
+            addAddressBtn?.addEventListener('click', function() {
+                addAddressField();
+            });
+        });
+    </script>
+</body>
+</html>

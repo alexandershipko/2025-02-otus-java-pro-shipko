@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layout}">
+<head>
+    <title>Phones</title>
+</head>
+<body>
+    <div layout:fragment="content">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h2>Phone Numbers</h2>
+        </div>
+
+        <div class="table-responsive">
+            <table class="table table-striped table-hover">
+                <thead class="table-dark">
+                    <tr>
+                        <th>ID</th>
+                        <th>Phone Number</th>
+                        <th>Client</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr th:if="${phones.empty}">
+                        <td colspan="3" class="text-center">No phone numbers found</td>
+                    </tr>
+                    <tr th:each="phone : ${phones}">
+                        <td th:text="${phone.id}"></td>
+                        <td th:text="${phone.number}"></td>
+                        <td>
+                            <a th:if="${#maps.containsKey(clientMap, phone.clientId)}"
+                               th:href="@{/clients/edit/{id}(id=${phone.clientId})}"
+                               th:text="${#maps.get(clientMap, phone.clientId).name}">
+                            </a>
+                            <span th:unless="${#maps.containsKey(clientMap, phone.clientId)}" class="text-muted">
+                                Client not found
+                            </span>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</body>
+</html>

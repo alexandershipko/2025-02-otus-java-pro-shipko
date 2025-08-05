@@ -1,0 +1,43 @@
+package ru.otus;
+
+import ru.otus.monitor.MonitorNumber;
+
+import java.util.List;
+
+//import static java.lang.Thread.sleep;
+
+
+public class Main {
+
+    public static void main(String[] args) {
+        MonitorNumber monitor = new MonitorNumber();
+        List<Thread> threads = monitor.alternateNumbers();
+
+//TODO раскомментировать, если не нужен вечный цикл
+//        try {
+//            sleep(20_000);
+//        } catch (InterruptedException e) {
+//            throw new RuntimeException(e);
+//        }
+//        threads.forEach(Thread::interrupt);
+    }
+
+}
+
+
+/**
+ * Домашнее задание
+ * Последовательность чисел
+ *
+ * Цель:
+ * Освоить базовые механизмы синхронизации.
+ *
+ *
+ * Описание/Пошаговая инструкция выполнения домашнего задания:
+ * Два потока печатают числа от 1 до 10, потом от 10 до 1.
+ * Надо сделать так, чтобы числа чередовались, т.е. получился такой вывод:
+ * Поток 1:1 2 3 4 5 6 7 8 9 10 9 8 7 6 5 4 3 2 1 2 3 4....
+ * Поток 2: 1 2 3 4 5 6 7 8 9 10 9 8 7 6 5 4 3 2 1 2 3....
+ *
+ * Всегда должен начинать Поток 1.
+ */

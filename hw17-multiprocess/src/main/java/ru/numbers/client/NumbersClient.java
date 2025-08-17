@@ -34,6 +34,7 @@ public class NumbersClient {
 
         try {
             boolean completed = observer.awaitCompletion(30, TimeUnit.SECONDS);
+
             if (!completed) {
                 log.warn("Таймаут ожидания завершения стрима");
             }
@@ -72,6 +73,7 @@ public class NumbersClient {
 
     private long getNextValue(ClientStreamObserver clientStreamObserver) {
         value = value + clientStreamObserver.getLastValueAndReset() + 1;
+
         return value;
     }
 

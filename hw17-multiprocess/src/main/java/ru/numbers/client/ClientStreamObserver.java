@@ -40,6 +40,7 @@ public class ClientStreamObserver implements StreamObserver<NumbersResponse> {
 
     private void setLastValue(long value) {
         lock.lock();
+
         try {
             this.lastValue = value;
         } finally {
@@ -49,6 +50,7 @@ public class ClientStreamObserver implements StreamObserver<NumbersResponse> {
 
     public long getLastValueAndReset() {
         lock.lock();
+
         try {
             var lastValuePrev = this.lastValue;
             this.lastValue = 0;

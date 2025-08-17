@@ -35,7 +35,7 @@ public class NumbersServer {
                 Thread.currentThread().interrupt();
                 server.shutdownNow();
             } finally {
-                NumbersServiceImpl.shutdownScheduler();
+                NumbersServiceImpl.shutdown();
             }
 
             log.info("Сервер остановлен");

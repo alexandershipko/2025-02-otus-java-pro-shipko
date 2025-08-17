@@ -7,6 +7,8 @@ import ru.numbers.AppProperties;
 import ru.numbers.NumbersRequest;
 import ru.numbers.NumbersServiceGrpc;
 
+import java.util.concurrent.TimeUnit;
+
 
 public class NumbersClient {
     private static final Logger log = LoggerFactory.getLogger(NumbersClient.class);
@@ -18,7 +20,6 @@ public class NumbersClient {
 
     private long value = 0;
 
-
     public static void main(String[] args) {
         log.info("Запуск NumbersClient");
 
@@ -29,14 +30,32 @@ public class NumbersClient {
 
         var asyncClient = NumbersServiceGrpc.newStub(managedChannel);
 
-        new NumbersClient().clientAction(asyncClient);
+        ClientStreamObserver observer = new NumbersClient().clientAction(asyncClient);
+
+        try {
+            boolean completed = observer.awaitCompletion(30, TimeUnit.SECONDS);
+            if (!completed) {
+                log.warn("Таймаут ожидания завершения стрима");
+            }
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+        }
 
         log.info("Завершаем работу NumbersClient");
 
         managedChannel.shutdown();
+
+        try {
+            if (!managedChannel.awaitTermination(5, TimeUnit.SECONDS)) {
+                managedChannel.shutdownNow();
+            }
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+            managedChannel.shutdownNow();
+        }
     }
 
-    private void clientAction(NumbersServiceGrpc.NumbersServiceStub asyncClient) {
+    private ClientStreamObserver clientAction(NumbersServiceGrpc.NumbersServiceStub asyncClient) {
         var numbersRequest = makeNumberRequest();
         var clientSteamObserver = new ClientStreamObserver();
 
@@ -44,16 +63,15 @@ public class NumbersClient {
 
         for (var i = 0; i < CLIENT_LOOP_SIZE; i++) {
             var valForPrint = getNextValue(clientSteamObserver);
-
             log.info("текущее значение: {}, i: {}", valForPrint, i);
-
             sleep();
         }
+
+        return clientSteamObserver;
     }
 
     private long getNextValue(ClientStreamObserver clientStreamObserver) {
         value = value + clientStreamObserver.getLastValueAndReset() + 1;
-
         return value;
     }
 

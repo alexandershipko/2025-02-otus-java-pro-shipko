@@ -8,7 +8,6 @@ import ru.numbers.AppProperties;
 
 import java.io.IOException;
 
-
 public class NumbersServer {
     private static final Logger log = LoggerFactory.getLogger(NumbersServer.class);
 
@@ -26,8 +25,18 @@ public class NumbersServer {
 
         Runtime.getRuntime().addShutdownHook(new Thread(() -> {
             log.info("Получен сигнал на завершение");
-
             server.shutdown();
+            try {
+                if (!server.awaitTermination(5, java.util.concurrent.TimeUnit.SECONDS)) {
+                    log.info("Принудительная остановка сервера");
+                    server.shutdownNow();
+                }
+            } catch (InterruptedException e) {
+                Thread.currentThread().interrupt();
+                server.shutdownNow();
+            } finally {
+                NumbersServiceImpl.shutdownScheduler();
+            }
 
             log.info("Сервер остановлен");
         }));

@@ -18,6 +18,7 @@ include("hw13-di")
 include("hw14-springDataJdbc")
 include("hw15-executors")
 include("hw16-concurrentCollections:QueueDemo")
+include("hw17-multiprocess")
 
 
 pluginManagement {
